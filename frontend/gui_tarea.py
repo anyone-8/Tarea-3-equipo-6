@@ -38,18 +38,18 @@ class gui(ctk.CTk):
         self._m_principal["variable"].trace_add("write", self.buscar_orden)
 
         e_place["menu_personajes"] = ctk.CTkScrollableFrame(self, width=1000, height=500)
-        e_place["opciones_busqueda"] = ctk.CTkOptionMenu(self, values=["por orden", "por nombre", "por categoria"], command=lambda choice: self.opciones_buscar(choice))
+        #e_place["opciones_busqueda"] = ctk.CTkOptionMenu(self, values=["por orden", "por nombre", "por categoria"], command=lambda choice: self.opciones_buscar(choice))
         e_place["titulo"] = ctk.CTkLabel(self, text="Personajes", font=self._m_principal["front"])
-        e_place["buscador"] = ctk.CTkEntry(self, textvariable=self._m_principal["variable"], width=300, height=30)
+        e_place["buscador"] = ctk.CTkEntry(self, width=300, height=30)
         e_place["añadir"] = ctk.CTkButton(self, text="añadir personaje", width=100, height=30, command=self.menu_añadir_personaje)
 
         e_place["menu_personajes"].place(relx=0.5, rely=0.5, anchor="center")
         e_place["titulo"].place(relx=0.5, rely=0.04, anchor="center")
         e_place["buscador"].place(relx=0.5, rely=0.1, anchor="center")
         e_place["añadir"].place(relx=0.7, rely=0.1, anchor="center")
-        e_place["opciones_busqueda"].place(relx=0.3, rely=0.1, anchor="center")
+        #e_place["opciones_busqueda"].place(relx=0.3, rely=0.1, anchor="center")
 
-        """
+        
         for elemento in self.crud_t.data.values():
             personaje_actual = elemento["nombre"]
             font2 = ctk.CTkFont(family="Helvetica", size=12, weight="bold")
@@ -68,7 +68,7 @@ class gui(ctk.CTk):
             nombre_personaje.place(relx=0.3, rely=0.5, anchor="e")
             mostrar_imagen.place(relx=0.8, rely=0.5, anchor="e")
             seleccionar.place(relx=0.5, rely=0.5, anchor="center")
-        """
+        
 
         self._parametro_sp = False
         self._parametro_ap = False
