@@ -1,0 +1,122 @@
+{
+    "personaje-1": {
+        "nombre": "Nagisa_Shiota",
+        "categoria": {
+            "funcion": "Protagonista",
+            "rol": "Estudiante",
+            "origen": "Assesination Classroom"
+        },
+        "caracteristicas": "Protagonista principal y narrador del anime y manga Assassination Classroom. Es un joven tranquilo, reservado, amable y muy observador.",
+        "imagen": "datos/imagenes/Nagisa_Shiota.jpg"
+    },
+    "personaje-5": {
+        "nombre": "Doctor_Doom",
+        "categoria": {
+            "funcion": "villano",
+            "rol": "supervillano",
+            "origen": "Marvel Comics"
+        },
+        "caracteristicas": "Es inteligente, ambicioso, poderoso y muy estrat\u00e9gico. Utiliza una armadura avanzada y tambi\u00e9n posee conocimientos de magia.\n",
+        "imagen": "datos/imagenes/Doctor_Doom.jpg"
+    },
+    "personaje-6": {
+        "nombre": "Spider_Man",
+        "categoria": {
+            "funcion": "Protagonista",
+            "rol": "Superheroe",
+            "origen": "Marvel Comics"
+        },
+        "caracteristicas": "Es valiente, inteligente, \u00e1gil y responsable. Tiene fuerza sobrehumana, puede trepar paredes y cuenta con un sentido ar\u00e1cnido.\n",
+        "imagen": "datos/imagenes/Spider_Man.jpg"
+    },
+    "personaje-7": {
+        "nombre": "Cristiano_Ronaldo",
+        "categoria": {
+            "funcion": "Deportista",
+            "rol": "Futbol",
+            "origen": "Portuguesa"
+        },
+        "caracteristicas": "Es disciplinado, competitivo, trabajador y muy dedicado al deporte. Destaca por su capacidad goleadora y condici\u00f3n f\u00edsica.\n",
+        "imagen": "datos/imagenes/Cristiano_Ronaldo.jpg"
+    },
+    "personaje-8": {
+        "nombre": "Lionel_Messi",
+        "categoria": {
+            "funcion": "Deportista",
+            "rol": "Futbolista",
+            "origen": "Argentina"
+        },
+        "caracteristicas": "Es creativo, habilidoso, preciso y destacado por su control del bal\u00f3n y capacidad para marcar goles y dar asistencias.\n",
+        "imagen": "datos/imagenes/Lionel_Messi.jpg"
+    },
+    "personaje-9": {
+        "nombre": "Iron_Man",
+        "categoria": {
+            "funcion": "Protagonista",
+            "rol": "Heroe",
+            "origen": "Marvel Comics"
+        },
+        "caracteristicas": "Es inteligente, inventor, seguro de s\u00ed mismo y tecnol\u00f3gico. Utiliza armaduras de alta tecnolog\u00eda que le proporcionan fuerza, vuelo y diferentes armas.\n",
+        "imagen": "datos/imagenes/Iron_Man.jpg"
+    },
+    "personaje-10": {
+        "nombre": "Superman",
+        "categoria": {
+            "funcion": "Protagonista",
+            "rol": "Heroe",
+            "origen": "DC Comics"
+        },
+        "caracteristicas": "Es fuerte, valiente, noble y protector. Posee super fuerza, vuelo, supervelocidad y visi\u00f3n calor\u00edfica.\n",
+        "imagen": "datos/imagenes/Superman.jpg"
+    },
+    "personaje-11": {
+        "nombre": "Doctor_Simi",
+        "categoria": {
+            "funcion": "Doctor",
+            "rol": "Mascota Comercial",
+            "origen": "Farmacias Similares"
+        },
+        "caracteristicas": "Es amigable, divertido, alegre y muy reconocible por su apariencia de m\u00e9dico y sus botargas.\t\n",
+        "imagen": "datos/imagenes/Doctor_Simi.jpg"
+    },
+    "personaje-12": {
+        "nombre": "Linterna_Verde",
+        "categoria": {
+            "funcion": "Protagonista",
+            "rol": "Heroe",
+            "origen": "DC Comics"
+        },
+        "caracteristicas": "Es valiente, decidido, disciplinado e imaginativo. Utiliza un anillo de poder capaz de crear objetos y construcciones de energ\u00eda.\n",
+        "imagen": "datos/imagenes/Linterna_Verde.jpg"
+    },
+    "personaje-13": {
+        "nombre": "El_Chapulin_Colorado",
+        "categoria": {
+            "funcion": "Protagonista",
+            "rol": "Heroe",
+            "origen": "Chespirito"
+        },
+        "caracteristicas": "Es noble, divertido, torpe y bien intencionado. Aunque suele tener miedo, intenta ayudar a las personas.\n",
+        "imagen": "datos/imagenes/El_Chapulin_Colorado.jpg"
+    },
+    "personaje-14": {
+        "nombre": "Haymitch_Abernathy",
+        "categoria": {
+            "funcion": "Secundario",
+            "rol": "Mentor",
+            "origen": "Los juegos del hambre"
+        },
+        "caracteristicas": "Es inteligente, sarc\u00e1stico, estrat\u00e9gico, desconfiado y tiene una gran capacidad para sobrevivir. Aunque puede parecer distante, se preocupa por las personas que quiere.\n",
+        "imagen": "datos/imagenes/Haymitch_Abernathy.jpg"
+    },
+    "personaje-2": {
+        "nombre": "fushi",
+        "categoria": {
+            "funcion": "Protagonista",
+            "rol": "Inmortal",
+            "origen": "To your eternity"
+        },
+        "caracteristicas": "Es, originalmente, una esfera enviada para recolectar datos con el objetivo de perservar la vida en la tierra\n",
+        "imagen": "datos/imagenes/fushi.jpg"
+    }
+}
