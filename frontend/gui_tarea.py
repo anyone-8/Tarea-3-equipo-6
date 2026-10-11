@@ -9,6 +9,7 @@ class gui(ctk.CTk):
         super().__init__()
         self.crud_t = crud()
 
+
         self._parametro_sp = False
         self._parametro_ap = False
         self._parametro_ep = False
@@ -35,19 +36,21 @@ class gui(ctk.CTk):
 
         self._m_principal["front"] = ctk.CTkFont(family="consolas", size=22, weight="bold")
         self._m_principal["variable"] = ctk.StringVar()
-        self._m_principal["variable"].trace_add("write", self.buscar_orden)
+        self._m_principal["variable"].trace_add("write", self.temporizador)
 
         e_place["menu_personajes"] = ctk.CTkScrollableFrame(self, width=1000, height=500)
-        #e_place["opciones_busqueda"] = ctk.CTkOptionMenu(self, values=["por orden", "por nombre", "por categoria"], command=lambda choice: self.opciones_buscar(choice))
+        e_place["opciones_busqueda"] = ctk.CTkOptionMenu(self, values=["por orden", "por nombre", "por categoria"], command=lambda choice: self.opciones_buscar(choice))
         e_place["titulo"] = ctk.CTkLabel(self, text="Personajes", font=self._m_principal["front"])
         e_place["buscador"] = ctk.CTkEntry(self, width=300, height=30)
         e_place["añadir"] = ctk.CTkButton(self, text="añadir personaje", width=100, height=30, command=self.menu_añadir_personaje)
+
+        e_place["buscador"].bind("<KeyRelease>", self.temporizador)
 
         e_place["menu_personajes"].place(relx=0.5, rely=0.5, anchor="center")
         e_place["titulo"].place(relx=0.5, rely=0.04, anchor="center")
         e_place["buscador"].place(relx=0.5, rely=0.1, anchor="center")
         e_place["añadir"].place(relx=0.7, rely=0.1, anchor="center")
-        #e_place["opciones_busqueda"].place(relx=0.3, rely=0.1, anchor="center")
+        e_place["opciones_busqueda"].place(relx=0.3, rely=0.1, anchor="center")
 
         
         for elemento in self.crud_t.data.values():
@@ -174,35 +177,6 @@ class gui(ctk.CTk):
         self._m_e_personaje["regresar"].place(relx=0.05, rely=0.05, anchor="nw")
 
         self._m_e_personaje["opciones"].set("nombre")
-
-    def sub_menu_p_nombre(self):
-        e_place = self._m_principal["place"]
-        e_place["menu_personajes"].place_forget()
-        e_place["buscador"].place_forget()
-
-        self._m_principal["front"] = ctk.CTkFont(family="consolas", size=22, weight="bold")
-        self._m_principal["variable"] = ctk.StringVar()
-        self._m_principal["variable"].trace_add("write", self.buscar_nombre)
-
-        e_place["buscador"] = ctk.CTkEntry(self, textvariable=self._m_principal["variable"], width=300, height=30)
-        e_place["buscador"].place(relx=0.5, rely=0.1, anchor="center")
-
-
-
-        
-
-
-    def sub_menu_p_categoria(self):
-        e_place = self._m_principal["place"]
-        e_place["menu_personajes"].place_forget()
-        e_place["buscador"].place_forget()
-
-        e_place["m_p_nombre"] = ctk.CTkScrollableFrame(self, width=1000, height=500)
-        e_place["m_p_nombre"].place(relx=0.5, rely=0.5, anchor="center")
-
-        e_place["buscador"] = ctk.CTkEntry(self, textvariable=self._m_principal["variable"], width=300, height=30)
-        e_place["buscador"].place(relx=0.5, rely=0.1, anchor="center")
-
 
     def ocultar_menu(self):
         for elemento in self._m_principal["place"].values():
@@ -399,35 +373,33 @@ class gui(ctk.CTk):
 
         self.crud_t.editar_imagen(elemento, opcion, imagen)
 
-    def opciones_buscar(self, opcion):
+    def opciones_buscar(self, opcion=None):
         self._parametro_buscar = True
-        if opcion == "por orden":
-            self.menu_principal()
-        elif opcion == "por nombre":
-            self.sub_menu_p_nombre()
-        elif opcion == "por categoria":
-            self.sub_menu_p_categoria()
 
-    def buscar_orden(self, *args):
+        if opcion == None:
+            opcion = self._m_principal["place"]["opciones_busqueda"].get()
+        if opcion == "por orden":
+            self.buscar_orden()
+        elif opcion == "por nombre":
+            self.buscar_nombre()
+        elif opcion == "por categoria":
+            self.buscar_categoria()
+
+    def temporizador(self, *arg):
+        if self._temporizador:
+            self.after_cancel(self._temporizador)
+
+        self.temporizador = self.after(1000, self.buscar_orden)
+
+    def buscar_orden(self):
 
         texto = self._m_principal["place"]["buscador"].get().lower().replace(" ", "")
 
-        if "menu_personajes" in self._m_principal["place"]:
-            self._m_principal["place"]["menu_personajes"].place_forget()
+        for widget in self._m_principal["place"]["menu_personajes"].winfo_children():
+            widget.pack_forget()
 
-        self._m_principal["front"] = ctk.CTkFont(family="consolas", size=22, weight="bold")
-        #self._m_principal["variable"] = ctk.StringVar()
-        self._m_principal["variable"].trace_add("write", self.buscar_orden)
-
-        self._m_principal["place"]["menu_personajes"].place_forget()
-
-        self._m_principal["place"]["m_p_nombre"] = ctk.CTkScrollableFrame(self, width=1000, height=500)
-
-        self._m_principal["place"]["m_p_nombre"].place(relx=0.5, rely=0.5, anchor="center")
-
-
-
-
+        #if "menu_personajes" in self._m_principal["place"]:
+            #self._m_principal["place"]["menu_personajes"].place_forget()
 
         if texto != "":
             for clave, elemento in self.crud_t.data.items():
@@ -435,7 +407,7 @@ class gui(ctk.CTk):
                     personaje_actual = elemento["nombre"]
                     font2 = ctk.CTkFont(family="Helvetica", size=12, weight="bold")
                     
-                    contenedores = ctk.CTkFrame(master=self._m_principal["place"]["m_p_nombre"], width=450, height=50, border_width=4, border_color="white")
+                    contenedores = ctk.CTkFrame(master=self._m_principal["place"]["menu_personajes"], width=450, height=50, border_width=4, border_color="white")
                     seleccionar = ctk.CTkButton(master=contenedores, text="", fg_color="transparent", width=420, height=40, command=lambda n=elemento: self.selccionar_personaje(n))
                     nombre_personaje = ctk.CTkLabel(master=contenedores, text=personaje_actual, font=font2)
                     imagen = Image.open(elemento["imagen"])
@@ -451,7 +423,7 @@ class gui(ctk.CTk):
                 personaje_actual = elemento["nombre"]
                 font2 = ctk.CTkFont(family="Helvetica", size=12, weight="bold")
             
-                contenedores = ctk.CTkFrame(master=self._m_principal["place"]["m_p_nombre"], width=450, height=50, border_width=4, border_color="white")
+                contenedores = ctk.CTkFrame(master=self._m_principal["place"]["menu_personajes"], width=450, height=50, border_width=4, border_color="white")
                 seleccionar = ctk.CTkButton(master=contenedores, text="", fg_color="transparent", width=420, height=40, command=lambda n=elemento: self.selccionar_personaje(n))
                 nombre_personaje = ctk.CTkLabel(master=contenedores, text=personaje_actual, font=font2)
                 imagen = Image.open(elemento["imagen"])
@@ -469,24 +441,41 @@ class gui(ctk.CTk):
     def buscar_nombre(self, *args):
         e_place = self._m_principal["place"]
 
-        
+        for widget in self._m_principal["place"]["menu_personajes"].winfo_children():
+            widget.pack_forget()
 
         texto = self._m_principal["place"]["buscador"].get().lower().replace(" ", "")
-        e_place["m_p_nombre"] = ctk.CTkScrollableFrame(self, width=1000, height=500)
-        e_place["m_p_nombre"].place(relx=0.5, rely=0.5, anchor="center")
 
-        if texto:
+        if texto != "":
             for elemento in self.crud_t.data.values():
                 if texto in elemento["nombre"].lower().replace("-", ""):
                     personaje_actual = elemento["nombre"]
                     font2 = ctk.CTkFont(family="Helvetica", size=12, weight="bold")
                                     
-                    contenedores = ctk.CTkFrame(master=e_place["m_p_nombre"], width=450, height=50, border_width=4, border_color="white")
+                    contenedores = ctk.CTkFrame(master=e_place["menu_personajes"], width=450, height=50, border_width=4, border_color="white")
                     seleccionar = ctk.CTkButton(master=contenedores, text="", fg_color="transparent", width=420, height=40, command=lambda n=elemento: self.selccionar_personaje(n))
                     nombre_personaje = ctk.CTkLabel(master=contenedores, text=personaje_actual, font=font2)
                     imagen = Image.open(elemento["imagen"])
                     imagen_final = ctk.CTkImage(light_image=imagen, dark_image=imagen, size=(30, 30))
                 
+                    contenedores.pack(padx=0.2, pady=3)
+                    mostrar_imagen = ctk.CTkLabel(master=contenedores, image=imagen_final, text="")
+                    nombre_personaje.place(relx=0.3, rely=0.5, anchor="e")
+                    mostrar_imagen.place(relx=0.8, rely=0.5, anchor="e")
+                    seleccionar.place(relx=0.5, rely=0.5, anchor="center")    
+
+        elif texto == "":
+            for elemento in self.crud_t.data.values():
+                if texto in elemento["nombre"].lower().replace("-", ""):
+                    personaje_actual = elemento["nombre"]
+                    font2 = ctk.CTkFont(family="Helvetica", size=12, weight="bold")
+                                            
+                    contenedores = ctk.CTkFrame(master=e_place["menu_personajes"], width=450, height=50, border_width=4, border_color="white")
+                    seleccionar = ctk.CTkButton(master=contenedores, text="", fg_color="transparent", width=420, height=40, command=lambda n=elemento: self.selccionar_personaje(n))
+                    nombre_personaje = ctk.CTkLabel(master=contenedores, text=personaje_actual, font=font2)
+                    imagen = Image.open(elemento["imagen"])
+                    imagen_final = ctk.CTkImage(light_image=imagen, dark_image=imagen, size=(30, 30))
+                        
                     contenedores.pack(padx=0.2, pady=3)
                     mostrar_imagen = ctk.CTkLabel(master=contenedores, image=imagen_final, text="")
                     nombre_personaje.place(relx=0.3, rely=0.5, anchor="e")
@@ -496,20 +485,19 @@ class gui(ctk.CTk):
     def buscar_categoria(self, *args):
         e_place = self._m_principal["place"]
 
-        if "menu_personajes" in e_place:
-            e_place["menu_personajes"].place_forget()
+        for widget in self._m_principal["place"]["menu_personajes"].winfo_children():
+            widget.pack_forget()
 
         texto = e_place["buscador"].get().lower().replace(" ", "")
-        e_place["m_p_nombre"] = ctk.CTkScrollableFrame(self, width=1000, height=500)
-        e_place["m_p_nombre"].place(relx=0.5, rely=0.5, anchor="center")
 
-        if texto:
+
+        if texto != "":
             for elemento in self.crud_t.data.values():
                 if any(texto.lower().replace(" ", "") in str(valor_texto).lower().replace(" ", "") for valor_texto in elemento["categoria"].values()):
                     personaje_actual = elemento["nombre"]
                     font2 = ctk.CTkFont(family="Helvetica", size=12, weight="bold")
                                     
-                    contenedores = ctk.CTkFrame(master=e_place["m_p_nombre"], width=450, height=50, border_width=4, border_color="white")
+                    contenedores = ctk.CTkFrame(master=e_place["menu_personajes"], width=450, height=50, border_width=4, border_color="white")
                     seleccionar = ctk.CTkButton(master=contenedores, text="", fg_color="transparent", width=420, height=40, command=lambda n=elemento: self.selccionar_personaje(n))
                     nombre_personaje = ctk.CTkLabel(master=contenedores, text=personaje_actual, font=font2)
                     imagen = Image.open(elemento["imagen"])
@@ -519,4 +507,28 @@ class gui(ctk.CTk):
                     mostrar_imagen = ctk.CTkLabel(master=contenedores, image=imagen_final, text="")
                     nombre_personaje.place(relx=0.3, rely=0.5, anchor="e")
                     mostrar_imagen.place(relx=0.8, rely=0.5, anchor="e")
-                    seleccionar.place(relx=0.5, rely=0.5, anchor="center") 
+                    seleccionar.place(relx=0.5, rely=0.5, anchor="center")
+
+        elif texto == "":
+            for elemento in self.crud_t.data.values():
+                if any(texto.lower().replace(" ", "") in str(valor_texto).lower().replace(" ", "") for valor_texto in elemento["categoria"].values()):
+                    personaje_actual = elemento["nombre"]
+                    font2 = ctk.CTkFont(family="Helvetica", size=12, weight="bold")
+                                            
+                    contenedores = ctk.CTkFrame(master=e_place["menu_personajes"], width=450, height=50, border_width=4, border_color="white")
+                    seleccionar = ctk.CTkButton(master=contenedores, text="", fg_color="transparent", width=420, height=40, command=lambda n=elemento: self.selccionar_personaje(n))
+                    nombre_personaje = ctk.CTkLabel(master=contenedores, text=personaje_actual, font=font2)
+                    imagen = Image.open(elemento["imagen"])
+                    imagen_final = ctk.CTkImage(light_image=imagen, dark_image=imagen, size=(30, 30))
+                        
+                    contenedores.pack(padx=0.2, pady=3)
+                    mostrar_imagen = ctk.CTkLabel(master=contenedores, image=imagen_final, text="")
+                    nombre_personaje.place(relx=0.3, rely=0.5, anchor="e")
+                    mostrar_imagen.place(relx=0.8, rely=0.5, anchor="e")
+                    seleccionar.place(relx=0.5, rely=0.5, anchor="center")
+
+    def temporizador(self, evento):
+        if hasattr(self, "_temporizador") and self._temporizador is not None:
+            self.after_cancel(self._temporizador)
+
+        self._temporizador = self.after(500, self.opciones_buscar)
