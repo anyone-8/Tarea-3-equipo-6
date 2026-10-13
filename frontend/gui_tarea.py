@@ -217,17 +217,34 @@ class gui(ctk.CTk):
         e_place = self._m_a_personaje["place"]
 
         nombre = e_place["caja_nombre"].get()
+        
         funcion = e_place["caja_funcion"].get()
         rol = e_place["caja_rol"].get()
         origen = e_place["caja_origen"].get()
         caracteristicas = e_place["caja_caracteristicas"].get("1.0", "end")
 
+
         variable = self.crud_t.añadir_personaje(nombre, funcion, rol, origen, caracteristicas, self._archivo)
+        
 
         if variable != None:
-            self._m_a_personaje["place"]["error"] = ctk.CTkLabel(self, text=variable)
+            for personaje in self.crud_t.data.values():
+                if nombre.lower().replace(" ", "") == personaje["nombre"].lower().replace(" ", ""):
+                    
+                    self.ocultar_añadir_personaje()
+                    self.selccionar_personaje(personaje)
 
-            self._m_a_personaje["place"]["error"].place(relx=0.7, rely=0.2, anchor="nw")
+                    self._m_a_personaje["place"]["existente"] = ctk.CTkLabel(self, text="Personaje ya existente")
+
+                    self._m_a_personaje["place"]["existente"].place(relx=0.7, rely=0.1, anchor="center")
+                    break
+
+        else:
+            print("no se pudo añadir")
+
+                    
+
+
 
     def eliminar_personaje_gui(self, elemento):
         self.confirmar = ctk.CTkToplevel(self)
