@@ -2,6 +2,7 @@
 import json
 import shutil
 import os
+from google import genai
 
 class crud():
     def __init__(self, ruta="datos/data_tarea.json"):
@@ -151,4 +152,63 @@ class crud():
         else:
             return "No se pudo guardar la imagen"
 
+    def buscar_por_imagen(self, imagen):
+        print("\n--- [INICIO DE PROCESAMIENTO IA] ---")
+        print(f"[PASO 1]: Recibiendo ruta del archivo -> {imagen}")
         
+        # OJO: Verifica si tu API key real empieza con AIzaSy... 
+        key = ""
+        print(f"[PASO 2]: Configurando credenciales con API Key (Longitud: {len(key)} caracteres)")
+        
+        try:
+            # Inicializamos el cliente oficial de Google GenAI
+            cliente = genai.Client(api_key=key)
+            print("[PASO 3]: Cliente de Gemini instanciado correctamente.")
+            
+            # Intentamos abrir el archivo binario
+            print("[PASO 4]: Intentando abrir y leer el archivo de imagen en modo binario...")
+            with open(imagen, "rb") as f:
+                bytes_de_imagen = f.read()
+            print(f"[PASO 5]: Archivo leído con éxito. Tamaño de la imagen: {len(bytes_de_imagen)} bytes.")
+
+            # Empaquetamos la imagen para enviarla
+            print("[PASO 6]: Convirtiendo bytes al formato Part requerido por Gemini (image/jpeg)...")
+            imagen_ia = genai.types.Part.from_bytes(
+                data=bytes_de_imagen, 
+                mime_type="image/jpeg"
+            )
+            print("[PASO 7]: Objeto de imagen preparado con éxito.")
+
+            # Creamos las instrucciones estrictas
+            promt = """
+            Analiza detalladamente esta imagen. Identifica qué personaje, superhéroe, deportista o figura pública aparece en ella.
+            Responde ÚNICAMENTE con su nombre más famoso y reconocible (por ejemplo: "Cristiano Ronaldo", "Spider-Man", "Doctor Doom").
+            No agregues descripciones ni explicaciones secundarias. Solo el nombre del personaje.
+            """
+            print("[PASO 8]: Prompt de instrucciones estructurado.")
+
+            # Hacemos la petición al servidor de Google
+            print("[PASO 9]: Enviando petición de red a los servidores de Google (Modelo: gemini-2.5-flash)...")
+            response = cliente.models.generate_content(
+                model="gemini-3.8-flash", 
+                contents=[imagen_ia, promt]
+            )
+            print("[PASO 10]: Respuesta recibida desde el servidor de Google.")
+
+            # Validamos el texto devuelto
+            if response.text:
+                resultado = response.text.strip()
+                print(f"[PASO EXTRAORDINARIO]: Gemini identificó el contenido como -> '{resultado}'")
+                print("--- [FIN DE PROCESAMIENTO IA: ÉXITO] ---\n")
+                return resultado
+            else:
+                print("[ALERTA]: El servidor de Google respondió, pero el texto del resultado llegó vacío.")
+                print("--- [FIN DE PROCESAMIENTO IA: RESPUESTA VACÍA] ---\n")
+                return "ninguno"
+
+        except Exception as e:
+            # Captura y muestra el error detallado de Python en la consola
+            print(f"\n[¡ERROR CRÍTICO EN PASO ACTIVO!]: Ha ocurrido una excepción durante la ejecución:")
+            print(f"Detalle del error: {e}")
+            print("--- [FIN DE PROCESAMIENTO IA: FALLIDO] ---\n")
+            return "ninguno"
