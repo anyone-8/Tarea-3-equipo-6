@@ -3,6 +3,7 @@
 from backend.crud_tarea import crud #type: ignore
 import customtkinter as ctk
 from PIL import Image
+import os
 
 class gui(ctk.CTk):
     def __init__(self):
@@ -43,6 +44,7 @@ class gui(ctk.CTk):
         e_place["titulo"] = ctk.CTkLabel(self, text="Personajes", font=self._m_principal["front"])
         e_place["buscador"] = ctk.CTkEntry(self, width=300, height=30)
         e_place["añadir"] = ctk.CTkButton(self, text="añadir personaje", width=100, height=30, command=self.menu_añadir_personaje)
+        e_place["buscar_imagen"] = ctk.CTkButton(self, text="abuscar por imagen", width=300, height=30, command=self.menu_buscar_imagen)
 
         e_place["buscador"].bind("<KeyRelease>", self.temporizador)
 
@@ -51,6 +53,7 @@ class gui(ctk.CTk):
         e_place["buscador"].place(relx=0.5, rely=0.1, anchor="center")
         e_place["añadir"].place(relx=0.7, rely=0.1, anchor="center")
         e_place["opciones_busqueda"].place(relx=0.3, rely=0.1, anchor="center")
+        e_place["buscar_imagen"].place(relx=0.1, rely=0.02, anchor="nw")
 
         
         for elemento in self.crud_t.data.values():
@@ -201,6 +204,9 @@ class gui(ctk.CTk):
             elemento.place_forget()
 
     def subir_imagen(self):
+        self._m_a_personaje ={}
+        self._m_a_personaje["place"] = {}
+        
         self._archivo = ctk.filedialog.askopenfilename(title="selecciona una iamgen", filetypes=[("Imagenes jpg", "*.jpg")])
 
         if self._archivo:
@@ -549,3 +555,177 @@ class gui(ctk.CTk):
             self.after_cancel(self._temporizador)
 
         self._temporizador = self.after(500, self.opciones_buscar)
+
+    def menu_buscar_imagen(self):
+        self.ocultar_menu()
+        self._parametro_mi = True
+
+        self._m_imagen = {}
+        self._m_imagen["place"] = {}
+        e_place = self._m_imagen["place"]
+
+        # Forzamos a que inicie vacía en cada nueva navegación
+        self._archivo_ia = None
+
+        e_place["volver"] = ctk.CTkButton(self, text="volver", width=100, height=30, command=lambda: self.eliminar_menu_imagen("volver"))
+        e_place["buscar"] = ctk.CTkButton(self, text="buscar", width=200, height=50, command=self.subir_ia)
+        e_place["imagen"] = ctk.CTkButton(self, text="subir imagen", width=200, height=50, command=self.subir_imagen_ia)
+        
+        e_place["volver"].place(relx=0.1, rely=0.1, anchor="nw")
+        e_place["buscar"].place(relx=0.7, rely=0.2, anchor="nw")
+        e_place["imagen"].place(relx=0.7, rely=0.60, anchor="nw")
+
+    def subir_imagen_ia(self):
+        # Almacenamos la ruta directamente en el atributo de la clase para que subir_ia lo pueda leer
+        ruta = ctk.filedialog.askopenfilename(title="selecciona una imagen", filetypes=[("Imagenes jpg", "*.jpg")])
+
+        if ruta:
+            self._archivo_ia = ruta # <-- Aquí se asegura el almacenamiento
+            imagen_subida = Image.open(self._archivo_ia)
+            imagen_final = ctk.CTkImage(light_image=imagen_subida, dark_image=imagen_subida, size=(200, 200))
+            
+            self._m_imagen["place"]["mostrar_imagen"] = ctk.CTkLabel(self, image=imagen_final, text="")
+            self._m_imagen["place"]["mostrar_imagen"].place(relx=0.3, rely=0.3, anchor="nw")
+
+    def subir_ia(self):
+        if not hasattr(self, '_archivo_ia') or self._archivo_ia is None:
+            print("Por favor, selecciona una imagen primero.")
+            return
+
+        print("Iniciando flujo de comunicación con el Backend...")
+        resultado = self.crud_t.buscar_por_imagen(self._archivo_ia)
+        
+        if not resultado or resultado.lower() == "ninguno":
+            print("El sistema no continuará la búsqueda debido a que la IA no devolvió un personaje válido.")
+            return
+
+        resultado_limpio = resultado.lower().replace("_", " ").split()
+
+        # Búsqueda por coincidencia exacta de palabras en tu base de datos JSON
+        for clave, personaje in self.crud_t.data.items():
+            nombre_json = personaje["nombre"].lower().replace("_", " ")
+            
+            if any(palabra in nombre_json for palabra in resultado_limpio if len(palabra) > 2) or resultado.lower() in nombre_json:
+                print(f"¡Match exacto encontrado en tu JSON para!: {personaje['nombre']}")
+                self.eliminar_menu_imagen("buscar")
+                self.selccionar_personaje(personaje)
+                return
+                
+        print(f"La IA identificó a '{resultado}', pero ese personaje no existe dentro de tu JSON.")
+
+
+    def eliminar_menu_imagen(self, parametro=None):
+        # Ocultamos todos los elementos activos de este menú
+        for elemento in self._m_imagen["place"].values():
+            if elemento.winfo_exists():
+                elemento.place_forget()
+
+        # Si se presionó volver, regresamos al menú principal
+        if parametro == "volver":
+            self.menu_principal()
+
+
+
+"""
+    def menu_buscar_imagen(self):
+        self.ocultar_menu()
+        self._parametro_mi = True
+
+        self._m_imagen = {}
+        self._m_imagen["place"] = {}
+        e_place = self._m_imagen["place"]
+
+        # Inicializamos la variable del archivo limpia para esta búsqueda
+        self._archivo_ia = None
+
+        e_place["volver"] = ctk.CTkButton(self, text="volver", width=100, height=30, command=lambda: self.eliminar_menu_imagen("volver"))
+        e_place["buscar"] = ctk.CTkButton(self, text="buscar", width=200, height=50, command=self.subir_ia)
+        e_place["imagen"] = ctk.CTkButton(self, text="subir imagen", width=200, height=50, command=self.subir_imagen_ia)
+        
+        e_place["volver"].place(relx=0.1, rely=0.1, anchor="nw")
+        e_place["buscar"].place(relx=0.7, rely=0.2, anchor="nw")
+        e_place["imagen"].place(relx=0.7, rely=0.60, anchor="nw")
+
+    def subir_imagen_ia(self):
+        # Función exclusiva para este menú que evita romper el diccionario de añadir_personaje
+        self._archivo_ia = ctk.filedialog.askopenfilename(title="selecciona una imagen", filetypes=[("Imagenes jpg", "*.jpg")])
+
+        if self._archivo_ia:
+            imagen_subida = Image.open(self._archivo_ia)
+            imagen_final = ctk.CTkImage(light_image=imagen_subida, dark_image=imagen_subida, size=(200, 200))
+            
+            # Guardamos el label dentro del contenedor correcto (_m_imagen)
+            self._m_imagen["place"]["mostrar_imagen"] = ctk.CTkLabel(self, image=imagen_final, text="")
+            self._m_imagen["place"]["mostrar_imagen"].place(relx=0.3, rely=0.3, anchor="nw")
+
+    def subir_ia(self):
+        # Validamos que el usuario realmente haya seleccionado una imagen antes de llamar a la IA
+        if not hasattr(self, '_archivo_ia') or self._archivo_ia is None:
+            print("Por favor, selecciona una imagen primero.")
+            return
+
+        resultado = self.crud_t.buscar_por_imagen(self._archivo_ia)
+        
+        # Limpiamos espacios que la IA pueda retornar por error
+        resultado_limpio = resultado.strip() if resultado else ""
+
+        for clave, personaje in self.crud_t.data.items():
+            if resultado_limpio.lower() == personaje["nombre"].lower():
+                self.eliminar_menu_imagen("buscar") # <-- Pasamos un parámetro para que no falle
+                self.selccionar_personaje(personaje)
+                return
+                
+        print(f"La IA devolvió '{resultado}', pero no coincide con ningún personaje en el JSON.")
+
+    def eliminar_menu_imagen(self, parametro=None):
+        # Ocultamos todos los elementos activos de este menú
+        for elemento in self._m_imagen["place"].values():
+            if elemento.winfo_exists():
+                elemento.place_forget()
+
+        # Si se presionó volver, regresamos al menú principal
+        if parametro == "volver":
+            self.menu_principal()
+
+            """
+
+"""
+    def menu_buscar_imagen(self):
+        self.ocultar_menu()
+        self._parametro_mi = True
+
+        self._m_imagen = {}
+        self._m_imagen["place"] = {}
+        e_place = self._m_imagen["place"]
+
+        e_place["volver"] = ctk.CTkButton(self, text="volver", width=100, height=30, command=lambda n="volver": self.eliminar_menu_imagen(n))
+        e_place["buscar"] = ctk.CTkButton(self, text="buscar", width=200,height=50, command=self.subir_ia)
+        e_place["imagen"] = ctk.CTkButton(self, text="subir imagen", width=200, height=50, command=self.subir_imagen)
+        e_place["volver"].place(relx=0.1, rely=0.1, anchor="nw")
+        e_place["buscar"].place(relx=0.7, rely=0.2, anchor="nw")
+        e_place["imagen"].place(relx=0.7, rely=0.60, anchor="nw")
+
+    def subir_ia(self):
+        resultado = self.crud_t.buscar_por_imagen(self._archivo)
+        for clave, personaje in self.crud_t.data.items():
+            if resultado == personaje["nombre"]:
+                self.eliminar_menu_imagen()
+                self.selccionar_personaje(self.crud_t.data[clave])
+
+
+
+
+
+
+
+    def eliminar_menu_imagen(self, parametro):
+        self._m_a_personaje ={}
+        self._m_a_personaje["place"] = {}
+        for elemento in self._m_imagen["place"].values():
+            elemento.place_forget()
+        self._m_a_personaje["place"]["mostrar_imagen"].place_forget()
+
+        if parametro == "volver":
+            self.menu_principal()
+        
+        """
